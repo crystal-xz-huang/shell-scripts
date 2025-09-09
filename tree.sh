@@ -1,20 +1,13 @@
 #!/usr/bin/env bash
 
 #==============================================================================
-# Print the directory tree of a specified folder
-# tree.sh
+# FILE: tree.sh (simple version of the linux tree utility)
 #
-# A clone of the tree utility with additional features
-# such as displaying file sizes, sorting directories before files,
+# DESCRIPTION: Print the directory tree of a specified folder, with options
+# for displaying file sizes, sorting directories before files, etc.
 #
-# Notes: Requires the 'file' and 'stat' commands
+# USAGE: tree [OPTIONS] <directory>
 #
-# Crystal Huang
-#
-#------------------------------------------------------------------------------
-# USAGE:
-#   tree [OPTIONS] [directory]
-#------------------------------------------------------------------------------
 # OPTIONS:
 #   -s          Print the size of each file in bytes.
 #   -h          Print the size of each file in a human-readable way
@@ -24,7 +17,7 @@
 #   -o file     Send output to the specified file.
 #   --dirsfirst List directories before files.
 #   --help      Display this help message.
-#------------------------------------------------------------------------------
+#
 # EXAMPLES:
 #   Print the tree with file sizes in bytes:
 #       tree -s /path/to/directory
@@ -37,37 +30,23 @@
 #
 #   Print the tree with directories listed before files:
 #       tree --dirsfirst /path/to/directory
+#
+# NOTES:
+# Requires the `file` and `stat` commands
+# Alternatively in one line (without colors and options):
+#   find . | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
 #==============================================================================
 
-if [ -z "$1" ]; then
-  echo "Usage: $0 /path/to/folder"
-  exit 1
-fi
-
-# Define ANSI color codes
 RESET='\033[0m'
 RED='\033[0;91m'
 GREEN='\033[0;92m'
 BLUE='\033[1;94m'
 CYAN='\033[1;96m'
 
-# Define a list of MIME types for compressed archives
-ARCHIVE_MIME_TYPES=(
-    "application/zip"                                # .zip
-    "application/x-tar"                              # .tar
-    "application/gzip"                               # .gz
-    "application/x-bzip2"                            # .bz2
-    "application/x-xz"                               # .xz
-    "application/x-7z-compressed"                    # .7z
-    "application/x-rar"                              # .rar
-    "application/java-archive"                       # .jar
-    "application/x-archive"                          # .ar
-    "application/vnd.android.package-archive"        # .apk
-    "application/vnd.debian.binary-package"          # .deb
-    "application/x-redhat-package-manager"           # .rpm
-    "application/vnd.microsoft.portable-executable"  # .exe
-    "application/vnd.ms-cab-compressed"              # .cab
-)
+if [ -z "$1" ]; then
+  echo "Usage: $0 /path/to/folder"
+  exit 1
+fi
 
 # Default values for options
 print_size=false
@@ -113,6 +92,24 @@ highlight_item() {
         echo "$display_name"
     fi
 }
+
+# List of common archive MIME types
+ARCHIVE_MIME_TYPES=(
+    "application/zip"                                # .zip
+    "application/x-tar"                              # .tar
+    "application/gzip"                               # .gz
+    "application/x-bzip2"                            # .bz2
+    "application/x-xz"                               # .xz
+    "application/x-7z-compressed"                    # .7z
+    "application/x-rar"                              # .rar
+    "application/java-archive"                       # .jar
+    "application/x-archive"                          # .ar
+    "application/vnd.android.package-archive"        # .apk
+    "application/vnd.debian.binary-package"          # .deb
+    "application/x-redhat-package-manager"           # .rpm
+    "application/vnd.microsoft.portable-executable"  # .exe
+    "application/vnd.ms-cab-compressed"              # .cab
+)
 
 is_archive() {
     local item=$1
